@@ -1,0 +1,10 @@
+# Build outputs
+bin/
+obj/
+.vs/
+*.user
+x64/
+Debug/
+Release/
+# Agent credentials
+.hermes/
