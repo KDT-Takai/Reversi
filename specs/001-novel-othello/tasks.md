@@ -32,7 +32,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement Board entity in src/core/board.hpp: `Cell{EMPTY,BLACK,WHITE}`, `Pos{row,col}`, `Board = array<array<Cell,8>,8>`, standard initial setup (d4/e5=WHITE, d4? per data-model: (3,3)/(4,4)=WHITE, (3,4)/(4,3)=BLACK), `count()`. NO DxLib includes
+- [ ] T005 Implement Board entity in src/core/board.hpp: `Cell{EMPTY,BLACK,WHITE}`, `Pos{row,col}`, `Board = array<array<Cell,8>,8>`, standard initial setup ((3,3)/(4,4)=WHITE, (3,4)/(4,3)=BLACK per data-model), `count()`. NO DxLib includes
 - [ ] T006 Implement ring + tide rotation in src/core/board.hpp: static `RING` = 28 Pos clockwise exactly as data-model.md ("上辺 (0,0)→(0,7)、右辺 (1,7)→(7,7)、下辺 (7,6)→(7,0)、左辺 (6,0)→(1,0)"); `rotate_ring(board, Dir::CW|CCW)` via temp copy; invariants: stone count unchanged, inner 6x6 unchanged
 - [ ] T007 Implement legal-move generation + flip application in src/core/rules.hpp: `legal_moves(board, player) -> vector<Move{pos,flips}>` (8-direction bracket scan, terminal same-player, ≥1 opponent stone between), `apply_flip` returning new Board (source immutable)
 - [ ] T008 Implement TideClock + Match state machine in src/core/match.hpp: fields per data-model.md (`hands_played` incremented ONLY on successful move; `next_in = 8 - hands_played % 8`; `next_dir` CW first, toggles each occurrence); `apply_move` contract order: illegal→no-op false → flip+turn swap+tide.on_move_applied → END CHECK (board full / no legal moves both sides / consecutive passes) ENDED stops here **no tide** → if hands%8==0 rotate_ring(next_dir) ; `pass()` (consecutive_passes++, tide unchanged, 2→ENDED); result enum BLACK_WIN/WHITE_WIN/DRAW by count
@@ -71,7 +71,7 @@
 
 **Independent Test**: CoreTests の AI 合法手保証 + quickstart #1・#8
 
-- [ ] T022 [US2] Implement AI engine in src/core/ai.hpp: shared evaluation (position weights corner>edge>x-square, mobility diff, stability count, tide-proximity bonus: when next_in ≤4 re-evaluate ring stones on a hypothetical board after applying the pending rotation) + alpha-beta; levels EASY=depth1 weighted-random among top, MEDIUM=depth4, STRONG=depth7 with move ordering; seeded RNG for determinism
+- [ ] T022 [US2] Implement AI engine in src/core/ai.hpp: shared evaluation (position weights corner>edge>x-square, mobility diff, tide-proximity bonus: when next_in ≤4 average position weights of current and pending-rotation board) + alpha-beta over Match copies (tide fires inside search); levels EASY=depth1 weighted-random among top (+random chance), MEDIUM=depth4, STRONG=iterative deepening up to depth7 with move ordering and 2.5s budget; seeded RNG for determinism
 - [ ] T023 [US2] Write AI tests in src/tests/main.cpp: fixed-seed 200 self-play plausibility runs — returned moves always legal; deterministic given seed; tide-proximity branch exercised (force next_in=1 position)
 - [ ] T024 [US2] Implement MODE_SELECT AI branch + MATCH_SETUP in src/game/scenes.cpp: 対コンピューター→易/普/強選択→石色ランダム決定（std::random_device）と通知「あなたは黒/白です」; 先手は常に黒
 - [ ] T025 [US2] Implement AI worker thread in src/game/scenes.cpp + anim: std::jthread one-shot thinking, mutex-guarded result slot, atomic done flag; input locked while thinking (FR-009); HUD 「CPU: 易/普/強」display vs-AI only
@@ -83,11 +83,11 @@
 
 ## Phase 5: User Story 3 - 2人で同じ画面で対局 (Priority: P2)
 
-**Goal**: 同卓モードの明示的フロー（玩家選択・手番明示）完成
+**Goal**: 同卓モードの明示的フロー（プレイヤー選択・手番明示）完成
 
 **Independent Test**: quickstart #6
 
-- [ ] T027 [US3] Complete hot-seat flow in src/game/scenes.cpp: 「2人で対局」entry + MATCH_SETUP 黑石玩家 selection; ensure 手番表示 alternates correctly and both players see identical tide events
+- [ ] T027 [US3] Complete hot-seat flow in src/game/scenes.cpp: 「2人で対局」entry + MATCH_SETUP 黒番プレイヤー selection; ensure 手番表示 alternates correctly and both players see identical tide events
 - [ ] T028 [US3] Validate: quickstart #6 (alternating clicks, turn display correctness)
 
 **Checkpoint**: US1+US2+US3 independently functional

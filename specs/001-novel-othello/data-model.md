@@ -14,11 +14,11 @@
 Operations（純関数）:
 - `legal_moves(board, player) -> vector<Move>` — 8 方向の挟み検査。盤外参照なし。
 - `apply_flip(board, move) -> Board` — 指定手の反転を適用した新盤を返す（元盤は不変）。
-- `rotate_ring(board, dir) -> Board` — dir ∈ {CW, CCW}。リング 28 マスの内容を 1 マス回転。内側 36 マスは逐字コピー。
+- `rotate_ring(board, dir) -> Board` — dir ∈ {CW, CCW}。リング 28 マスの内容を 1 マス回転。内側 36 マスはそのままコピー。
 - `count(board) -> {black, white}`
 
 Validation rules:
-- 合法手は EMPTY マスに置く手のみ。挟み列の終端は同一玩家の石で、間に相手の石が 1 つ以上。
+- 合法手は EMPTY マスに置く手のみ。挟み列の終端は同一プレイヤーの石で、間に相手の石が 1 つ以上。
 - `rotate_ring` は盤の石総数を変えない（テストで不変式検証）。
 
 ## Entity: TideClock
@@ -47,7 +47,7 @@ State transition: `on_move_applied()`: hands_played++ ; if hands_played % 8 == 0
 2. 反転適用 → turn 交換 → tide.on_move_applied()
 3. 終局判定（盤満了/双方合法手なし/連続パス）→ ENDED ならここで停止（**潮汐は行わない**）
 4. hands_played % 8 == 0 なら `board = rotate_ring(board, 発生方向)`
-5. 次の玩家の合法手集合を計算（無ければ次呼びでパス処理）
+5. 次のプレイヤーの合法手集合を計算（無ければ次呼びでパス処理）
 
 `Match.pass()` の契約: consecutive_passes++、turn 交換、tide は不変。2 で ENDED。
 
@@ -65,8 +65,8 @@ State transition: `on_move_applied()`: hands_played++ ; if hands_played % 8 == 0
 | level | enum {EASY, MEDIUM, STRONG} | 深さ 1(+ランダム)/4/7（research R4） |
 | rng seed | uint64_t | テストでは固定シードで決定論的 |
 
-`choose_move(match, level) -> Move` — 返す手は必ず `legal_moves` の成员。合法手なしは呼ばれない（呼び出し側が保証）。
-評価関数: 位置重み + 可搬性差 + 確定石 + 潮汐近接ボーナス（次回潮汐まで R<=4 のとき、R 手後の仮想盤で再評価）。
+`choose_move(match, level) -> Move` — 返す手は必ず `legal_moves` の要素。合法手なしは呼ばれない（呼び出し側が保証）。
+評価関数: 位置重み + 可搬性差 + 潮汐近接ボーナス（葉で次回潮汐まで R<=4 のとき、回転後の仮想盤と平均）。探索は Match を複製して進めるため読み筋内の潮汐は厳密に再現される（research R4）。
 
 ## Entity: GameFlow (UI 層の状態機械, src/game/)
 

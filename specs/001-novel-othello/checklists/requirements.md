@@ -18,7 +18,7 @@
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
-- [x] Edge cases are identified — 終局優先・合法手消滅・角間移動・アニメーション中输入を列挙
+- [x] Edge cases are identified — 終局優先・合法手消滅・角間移動・アニメーション中入力を列挙
 - [x] Scope is clearly bounded — v1 範囲外（待った/ヒント/保存）を FR-013 で明示
 - [x] Dependencies and assumptions identified
 

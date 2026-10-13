@@ -12,13 +12,13 @@
 
 ## Technical Context
 
-**Language/Version**: C++20 (MSVC, /W4 warning-clean)
+**Language/Version**: C++20 (MSVC v143=VS2022 / v145=VS 18 を自動選択, /W4 warning-clean)
 
 **Primary Dependencies**: DxLib Ver3.25a（プロジェクト内 vendoring: `vendor/DxLib/`。公式 https://dxlib.xsrv.jp/DxLib/DxLib_VC3_25a.zip から取得済み。ヘッダ 5 種 + x64 MD/MDd lib 一式）
 
 **Storage**: なし（v1 は永続化なし。FR-013 範囲外）
 
-**Testing**: `CoreTests` コンソールプロジェクト（assert ベースの决定论的テストランナー。コアの合法手・反転・潮汐・AI 合法手検証）
+**Testing**: `CoreTests` コンソールプロジェクト（assert ベースの決定論的テストランナー。コアの合法手・反転・潮汐・AI 合法手検証）
 
 **Target Platform**: Windows x64 デスクトップアプリ（固定ウィンドウ 1280x720）
 

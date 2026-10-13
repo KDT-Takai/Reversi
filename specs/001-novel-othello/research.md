@@ -16,7 +16,7 @@ All Technical Context unknowns resolved. No NEEDS CLARIFICATION remains.
 ## R2. Unicode と日本語テキスト描画
 
 - **Decision**: `UNICODE` を定義して DxLib のワイド文字 API（DrawString 等の _W 版）を使う。
-  自前ソースは UTF-8 (BOM) で書き、リテラルは `L"..."` ワイド文字列とする。
+  自前ソースは UTF-8 で書き（`/utf-8` 指定のため BOM 不要）、リテラルは `L"..."` ワイド文字列とする。
 - **Rationale**: MSVC は BOM 付き UTF-8 ソースを正しく解釈し、ワイドリテラル経由なら日本語が環境ロケールに
   依存せず安定。Shift-JIS の char* リテラルはシステムロケール依存で壊れやすい。pragma は UNICODE 分岐で
   DxLibW/DxUseCLibW を選ぶ（vendoring 済み）。
@@ -35,24 +35,27 @@ All Technical Context unknowns resolved. No NEEDS CLARIFICATION remains.
 
 ## R4. AI（易/普/強）と潮汐先読み
 
-- **Decision**: 同一の評価関数 + alpha-beta 探索、深さで差別化: 易=深さ1+手質上位から重み付きランダム、
-  普=深さ4、強=深さ7（着手順序付き）。評価項目: 位置重み（角>辺>危険辺内側）、可搬性差、確定石数、
-  **潮汐近接ボーナス**: 次回潮汐まで残り手数 R が小さい場合、リング上の石について「R 手後に潮汐を適用した
-  仮想盤」での位置価値を再計算して加算（R<=4 のときのみ、コスト O(合法手×28)）。
+- **Decision**: 同一の評価関数 + alpha-beta 探索、深さで差別化: 易=深さ1+手質上位から重み付きランダム
+  （一定確率で完全ランダム）、普=深さ4、強=反復深化で最大深さ7（着手順序付き・思考時間上限 2.5s）。
+  探索は `Match::apply_move` そのものを用いるため、**探索木内で潮汐が実際に発火する**（読み筋上の潮汐は厳密に反映）。
+  評価項目: 位置重み（角>辺>危険辺内側）、可搬性差、**潮汐近接ボーナス**: 葉局面で次回潮汐まで残り手数 R<=4 の
+  場合、位置重みを「現盤」と「次回方向で回転した仮想盤」の平均で評価する。
+- **Amendment (実装時, 2026-10-13)**: 当初の評価項目「確定石数」は削除。潮汐でリング上の石（角・辺を含む）は
+  移動するため、辺起点の確定石判定が成立しない。
 - **Rationale**: 深さ差別は実装が単一で手質差が保証しやすい（SC-005）。潮汐先読みは「R 手後に実際に起きる
   変換」を 1 回適用するだけで spec の「潮汐後の盤面を見据えた選択」を満たす。完全な多手潮汐シミュレーションは
   探索コストに対して効果が小さいため不要（YAGNI）。
-- **Alternatives considered**: ポジションテーブル事前計算、NN エンジン（依存・复杂度過大）、手毎に全潮汐適用の
+- **Alternatives considered**: ポジションテーブル事前計算、NN エンジン（依存・複雑さ過大）、手毎に全潮汐適用の
   完全シミュレーション（探索爆発）。不採用。
 
 ## R5. 描画・アニメーション・効果音
 
 - **Decision**: 60FPS 固定ループ。反転アニメは石の横幅係数 1→0→1（約 300ms）、潮汐スライドはリング全石を
-  弧に沿って補間（約 500ms）。アニメ中は入力ロック（spec の「アニメ中输入は状態を壊さない」を満たす最小実装）。
+  弧に沿って補間（約 500ms）。アニメ中は入力ロック（spec の「アニメ中入力は状態を壊さない」を満たす最小実装）。
   効果音は PCM をメモリ生成して `SoundMemLoad` で再生（着石=短いクリック、反転=上昇ノイズ、潮汐=低い掃引音、
   勝敗=和音）。外部アセットゼロ。
 - **Rationale**: SC-006 の即時応答と憲法 III を満たす最小構成。合成音は追加ファイル不要で単一ビルド経路に親和。
-- **Alternatives considered**: 外部効果音アセット（配布复杂度）、スレッド非同期アニメ（同期アニメで十分）。不採用。
+- **Alternatives considered**: 外部効果音アセット（配布複雑さ）、スレッド非同期アニメ（同期アニメで十分）。不採用。
 
 ## R6. スレッドモデル
 
@@ -60,20 +63,21 @@ All Technical Context unknowns resolved. No NEEDS CLARIFICATION remains.
   atomic フラグ + ミューテックス付き結果スロットで受け取る。思考中は盤面クリックを受け付けない（FR-009）。
 - **Rationale**: UI 応答性（SC-006）と「AI 思考中の連打も状態を壊さない」の直接充足。コアは不変コピーに対する
   純関数なのでスレッドセーフ。
-- **Alternatives considered**: 同期思考（強レベルで UI フreeze）、フレーム分割探索（実装复杂）。不採用。
+- **Alternatives considered**: 同期思考（強レベルで UI フリーズ）、フレーム分割探索（実装複雑）。不採用。
 
 ## R7. テスト戦略（憲法 I: コアはグラフィクスなしで単体検証可能）
 
 - **Decision**: `CoreTests` は assert ベースの console runner（追加テストフレームワークなし）。対象:
   合法手生成（標準ケース/角/辺/内側）、反転結果、パス・終局・引き分け判定、**潮汐回転の正しさ**（時計/反時計、
-  角→辺移動、8 実手で正確に 1 回発火、パスは計数しない）、AI が常に合法手のみを返す（乱席 200 試行・シード固定）、
+  角→辺移動、8 実手で正確に 1 回発火、パスは計数しない）、AI が常に合法手のみを返す（ランダム局面 200 試行・シード固定）、
   潮汐カウント表示値と match 内部状態の一致（SC-004 の自動部分）。
 - **Rationale**: 決定論的コア + 固定シードで再現性 100%。MSBuild で一緒にビルドされ quickstart から実行できる。
 - **Alternatives considered**: GoogleTest/Catch2（追加依存 = 憲法違反）、CMakectest（二重ビルド経路）。不採用。
 
 ## R8. ビルド設定
 
-- **Decision**: `Reversi.sln` + x64 Debug/Release。`/std:c++20 /W4 /utf-8 UNICODE _CRT_SECURE_NO_WARNINGS`、
+- **Decision**: `Reversi.sln` + x64 Debug/Release。PlatformToolset は `$(VisualStudioVersion)` で切替
+  （17.0=VS2022→v143、18.0=VS 18→v145）。開発機には VS 18 (v145) のみ導入済みのため両対応とする。`/std:c++20 /W4 /utf-8 UNICODE _CRT_SECURE_NO_WARNINGS`、
   IncludePath=`vendor/DxLib/include`、AdditionalLibraryDirectories=`vendor/DxLib/lib`（pragma 自動リンク）。
   MSBuild は vswhere で所在解決（quickstart に記載）。
 - **Rationale**: 警告ゼロ・単一経路。DxLib サンプル VS2022 用 vcxproj と同じリンク方式を確認済み。
