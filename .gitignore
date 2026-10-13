@@ -8,3 +8,4 @@ Debug/
 Release/
 # Agent credentials
 .hermes/
+vendor/_dl/
