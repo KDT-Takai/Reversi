@@ -85,6 +85,7 @@
     <ClInclude Include="src\game\sound.hpp" />
     <ClInclude Include="src\game\help.hpp" />
     <ClInclude Include="src\game\dx.hpp" />
+    <ClInclude Include="src\game\fx.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\game\main.cpp" />
@@ -93,6 +94,7 @@
     <ClCompile Include="src\game\anim.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\help.cpp" />
+    <ClCompile Include="src\game\fx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

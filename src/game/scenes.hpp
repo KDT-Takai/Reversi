@@ -4,17 +4,19 @@
 #include <atomic>
 #include <cstdint>
 #include <random>
+#include <string>
 #include <thread>
 
 #include "core/ai.hpp"
 #include "core/match.hpp"
 #include "game/anim.hpp"
+#include "game/fx.hpp"
 #include "game/render.hpp"
 
 namespace tidal::ui {
 
 enum class Scene { Title, ModeSelect, MatchSetup, Playing, Help, Result };
-enum class Mode { VsAi, HotSeat };
+enum class Mode { VsAi, HotSeat, AiVsAi };
 
 struct Input {
     int mouse_x = 0;
@@ -55,7 +57,7 @@ private:
     void update_title(const Input& in);
     void update_mode_select(const Input& in);
     void update_setup(const Input& in);
-    void update_playing(const Input& in);
+    void update_playing(const Input& in, float dt_sec);
     void update_result(const Input& in);
 
     void draw_title() const;
@@ -65,16 +67,19 @@ private:
     void draw_hud() const;
     void draw_result() const;
 
+    void go(Scene to);  // フェードイン付き画面遷移（FR-015）
     void open_help();
     void start_match();
     void begin_turn();
     void play_move(Pos pos);
     void finish_event();
     void leave_match(Scene to);
+    void enter_result();
 
     bool human_turn() const;
+    Level level_for(Cell c) const;
     std::wstring player_label(Cell c) const;
-    std::wstring color_name(Cell c) const;
+    BoardView shaken_board() const;
 
     Scene scene_ = Scene::Title;
     Scene help_return_ = Scene::Title;
@@ -83,12 +88,15 @@ private:
     int now_ms_ = 0;
     int last_now_ = -1;
     int play_ms_ = 0;  // 対局時計（ヘルプ表示中は止まる）
+    int fade_start_ms_ = -10000;
     int mouse_x_ = 0;
     int mouse_y_ = 0;
 
     // 対局設定
     Mode mode_ = Mode::VsAi;
-    Level level_ = Level::Medium;
+    Level level_ = Level::Medium;          // vs AI の CPU の強さ
+    Level black_level_ = Level::Medium;    // AI 対 AI
+    Level white_level_ = Level::Medium;    // AI 対 AI
     Cell human_color_ = Cell::Black;  // vs AI: 人間の石色 / 同卓: プレイヤー1 の石色
     std::mt19937_64 rng_;
 
@@ -105,6 +113,11 @@ private:
     bool ai_has_result_ = false;
     Pos ai_result_{};
     AiWorker ai_;
+
+    // 演出
+    Fx fx_;
+    int result_start_ms_ = 0;
+    bool celebrate_ = false;
 
     // タイトル画面の装飾盤
     Board title_board_{};

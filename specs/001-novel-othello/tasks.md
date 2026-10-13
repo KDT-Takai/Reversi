@@ -116,6 +116,14 @@
 
 ---
 
+## Phase 8: 追加要求 — 演出強化と AI 対 AI (FR-014〜FR-016, US5)
+
+- [X] T035 Implement particle/effects system in src/game/fx.hpp/.cpp (spawn, update by dt, draw; foam/confetti kinds) and screen-shake offset
+- [X] T036 Tide effects in src/game/scenes.cpp + render: 1000ms tide stage with cut-in band, ring light sweep in rotation direction, foam particles from moving ring stones, decaying board shake (FR-014)
+- [X] T037 Transitions/result effects in src/game/scenes.cpp: scene fade-in ~300ms, result panel slide-in, score count-up, confetti on win (none when human loses vs AI) (FR-015)
+- [X] T038 [US5] AI vs AI mode in src/game/scenes.cpp: MODE_SELECT entry, MATCH_SETUP per-color level selection, board clicks ignored, ≥700ms per move pacing, labels/HUD/result texts (FR-016)
+- [X] T039 Validate: build 0 warnings, CoreTests pass, screenshots of tide effect / result / AI vs AI to completion
+
 ## Dependencies & Execution Order
 
 - **Setup (P1 phase)** → **Foundational (phase 2, blocking gate T012)** → US1 → {US2, US3, US4} → Polish

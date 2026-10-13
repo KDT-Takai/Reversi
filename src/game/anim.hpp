@@ -9,7 +9,9 @@
 namespace tidal::ui {
 
 inline constexpr int kFlipMs = 300;
-inline constexpr int kTideMs = 500;
+inline constexpr int kTideMs = 500;          // リングのスライド時間
+inline constexpr int kTideStageMs = 1000;    // 潮汐演出全体（FR-014）
+inline constexpr int kTideSlideStartMs = 250;  // 演出開始からスライド開始まで
 
 struct Tween {
     int start = 0;
@@ -27,5 +29,14 @@ void draw_flip(const BoardView& v, const Board& after_flip, Pos placed, const st
 
 // 潮汐: リング上の全石が 1 マス分スライドする。before は潮汐前の盤。
 void draw_tide_slide(const BoardView& v, const Board& before, Dir dir, float t);
+
+// 潮汐中のリング石の現在位置（スライド進捗 t）
+void ring_disc_position(const BoardView& v, int ring_idx, Dir dir, float t, float& x, float& y);
+
+// 外周を回転方向へ駆け抜ける光の帯（t: 0..1 で一周）
+void draw_ring_sweep(const BoardView& v, Dir dir, float t);
+
+// 「潮 汐」カットイン帯（t: 0..1）
+void draw_tide_cutin(Dir dir, float t);
 
 }  // namespace tidal::ui

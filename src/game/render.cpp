@@ -247,10 +247,11 @@ void draw_panel(int x, int y, int w, int h) {
                     static_cast<float>(y + h), 12, 12, 16, color::panel_edge(), FALSE, 2.0f);
 }
 
-void draw_button(const Button& b, int mouse_x, int mouse_y, bool enabled) {
+void draw_button(const Button& b, int mouse_x, int mouse_y, bool enabled, bool selected) {
     const bool hover = enabled && b.contains(mouse_x, mouse_y);
-    const unsigned fill = !enabled ? rgb(40, 50, 64) : (hover ? rgb(44, 120, 150) : rgb(30, 64, 92));
-    const unsigned edge = hover ? color::accent() : color::panel_edge();
+    unsigned fill = !enabled ? rgb(40, 50, 64) : (hover ? rgb(44, 120, 150) : rgb(30, 64, 92));
+    if (selected) fill = rgb(36, 150, 178);
+    const unsigned edge = (hover || selected) ? color::accent() : color::panel_edge();
     DrawRoundRectAA(static_cast<float>(b.x), static_cast<float>(b.y), static_cast<float>(b.x + b.w),
                     static_cast<float>(b.y + b.h), 10, 10, 16, fill, TRUE);
     DrawRoundRectAA(static_cast<float>(b.x), static_cast<float>(b.y), static_cast<float>(b.x + b.w),

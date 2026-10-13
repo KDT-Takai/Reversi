@@ -78,6 +78,6 @@ struct Button {
     bool contains(int px, int py) const { return px >= x && px < x + w && py >= y && py < y + h; }
 };
 
-void draw_button(const Button& b, int mouse_x, int mouse_y, bool enabled = true);
+void draw_button(const Button& b, int mouse_x, int mouse_y, bool enabled = true, bool selected = false);
 
 }  // namespace tidal::ui
