@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Windows 10/11 x64
-- Visual Studio 2022（「デスクトップ用 C++」ワークロード。MSVC v143・Windows SDK 含む）
+- Visual Studio 2022（v143）または Visual Studio 18（v145）の「デスクトップ用 C++」ワークロード（ツールセットは vcxproj が自動選択）
 - その他のインストール不要（DxLib は `vendor/DxLib/` に同梱済み）
 
 ## Build

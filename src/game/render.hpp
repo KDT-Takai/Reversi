@@ -2,6 +2,7 @@
 // 盤面・石・HUD 部品の描画（DxLib 層）
 
 #include <string>
+#include <vector>
 
 #include "core/board.hpp"
 
@@ -50,7 +51,12 @@ void draw_background(int now_ms);
 void draw_board_base(const BoardView& v, int now_ms, float ring_glow);
 void draw_disc(float cx, float cy, float radius, Cell c, float xscale = 1.0f, float alpha = 1.0f);
 void draw_discs(const BoardView& v, const Board& b);
+// 合法手マス: 金色の脈打つ枠 + 中央の点（hover 時は強調）
+void draw_legal_marker(const BoardView& v, Pos p, int now_ms, bool hover);
+// hover 中の合法手に置いた場合のプレビュー石（半透明）
 void draw_ghost(const BoardView& v, Pos p, Cell c);
+// その手で裏返る石を橙の輪で示す
+void draw_flip_preview(const BoardView& v, const std::vector<Pos>& flips);
 void draw_last_move(const BoardView& v, Pos p);
 // 盤の外周に次回潮汐の向きを示す矢印を描く
 void draw_tide_arrows(const BoardView& v, Dir dir, int now_ms, float strength);

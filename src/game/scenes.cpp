@@ -430,11 +430,11 @@ void App::draw_playing_board() const {
         Pos hover{-1, -1};
         const bool on_board = kMainBoard.hit(mouse_x_, mouse_y_, hover);
         for (const auto& mv : match_.legal()) {
-            draw_ghost(v, mv.pos, match_.turn);
-            if (on_board && mv.pos == hover) {
-                const float x1 = v.x + v.cell * mv.pos.col;
-                const float y1 = v.y + v.cell * mv.pos.row;
-                DrawBoxAA(x1 + 2, y1 + 2, x1 + v.cell - 2, y1 + v.cell - 2, color::warn(), FALSE, 3.0f);
+            const bool hovered = on_board && mv.pos == hover;
+            draw_legal_marker(v, mv.pos, play_ms_, hovered);
+            if (hovered) {
+                draw_ghost(v, mv.pos, match_.turn);
+                draw_flip_preview(v, mv.flips);
             }
         }
     }
@@ -512,6 +512,8 @@ void App::draw_hud() const {
     } else if (match_.tide.next_in() == 1 && !match_.ended()) {
         draw_text(x, y, L"次の手のあと、潮汐が起きます", color::accent(), f.normal);
     }
+    if (stage_ == Stage::Idle && human_turn() && !match_.ended())
+        draw_text(x, y + 40, L"金色の枠のマスに置けます", color::text_dim(), f.caption);
 
     draw_button(kHudHelp, mouse_x_, mouse_y_, scene_ == Scene::Playing);
     draw_button(kHudQuit, mouse_x_, mouse_y_, scene_ == Scene::Playing);

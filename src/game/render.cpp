@@ -143,8 +143,28 @@ void draw_discs(const BoardView& v, const Board& b) {
         for (int c = 0; c < kSize; ++c) draw_disc(v.cx(c), v.cy(r), v.cell * 0.42f, b[r][c]);
 }
 
+void draw_legal_marker(const BoardView& v, Pos p, int now_ms, bool hover) {
+    const float x1 = v.x + v.cell * p.col;
+    const float y1 = v.y + v.cell * p.row;
+    const float pulse = 0.5f + 0.5f * std::sin(static_cast<float>(now_ms) / 1000.0f * 4.0f);
+    const unsigned gold = rgb(255, 214, 80);
+    // マス全体を金色で淡く塗り、枠で囲む（石と見間違えない形にする）
+    set_alpha(hover ? 0.40f : 0.16f + 0.12f * pulse);
+    DrawBoxAA(x1 + 3, y1 + 3, x1 + v.cell - 3, y1 + v.cell - 3, gold, TRUE);
+    set_alpha(hover ? 1.0f : 0.65f + 0.35f * pulse);
+    DrawBoxAA(x1 + 4, y1 + 4, x1 + v.cell - 4, y1 + v.cell - 4, gold, FALSE, hover ? 4.0f : 2.5f);
+    reset_blend();
+    if (!hover) DrawCircleAA(v.cx(p.col), v.cy(p.row), v.cell * 0.09f, 20, gold, TRUE);
+}
+
 void draw_ghost(const BoardView& v, Pos p, Cell c) {
-    draw_disc(v.cx(p.col), v.cy(p.row), v.cell * 0.30f, c, 1.0f, 0.38f);
+    draw_disc(v.cx(p.col), v.cy(p.row), v.cell * 0.42f, c, 1.0f, 0.55f);
+}
+
+void draw_flip_preview(const BoardView& v, const std::vector<Pos>& flips) {
+    for (Pos p : flips) {
+        DrawCircleAA(v.cx(p.col), v.cy(p.row), v.cell * 0.44f, 32, rgb(255, 150, 60), FALSE, 3.0f);
+    }
 }
 
 void draw_last_move(const BoardView& v, Pos p) {
