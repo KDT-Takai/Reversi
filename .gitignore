@@ -9,3 +9,8 @@ Release/
 # Agent credentials
 .hermes/
 vendor/_dl/
+# Logs
+*.log
+Log.txt
+.vscode/
+.idea/
