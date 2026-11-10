@@ -70,7 +70,7 @@ void draw_ring_sweep(const BoardView& v, Dir dir, float t) {
         const float x1 = v.x + v.cell * p.col;
         const float y1 = v.y + v.cell * p.row;
         SetDrawBlendMode(DX_BLENDMODE_ADD, static_cast<int>(200 * a));
-        DrawBoxAA(x1, y1, x1 + v.cell, y1 + v.cell, GetColor(120, 230, 255), TRUE);
+        DrawBoxAA(x1, y1, x1 + v.cell, y1 + v.cell, GetColor(104, 156, 210), TRUE);
     }
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
@@ -83,10 +83,10 @@ void draw_tide_cutin(Dir dir, float t) {
     const float band_y = 300.0f;
     const float band_h = 120.0f;
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, 170);
-    DrawBoxAA(offset, band_y, offset + kScreenW, band_y + band_h, GetColor(8, 40, 60), TRUE);
+    DrawBoxAA(offset, band_y, offset + kScreenW, band_y + band_h, GetColor(10, 22, 38), TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-    DrawLineAA(offset, band_y, offset + kScreenW, band_y, color::accent(), 3.0f);
-    DrawLineAA(offset, band_y + band_h, offset + kScreenW, band_y + band_h, color::accent(), 3.0f);
+    DrawLineAA(offset, band_y, offset + kScreenW, band_y, color::warn(), 2.0f);
+    DrawLineAA(offset, band_y + band_h, offset + kScreenW, band_y + band_h, color::warn(), 2.0f);
     // 帯の中を流れる波線
     for (int k = 0; k < 2; ++k) {
         float px = offset;

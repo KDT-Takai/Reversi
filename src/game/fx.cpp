@@ -25,15 +25,15 @@ void Fx::foam(float x, float y, float dir_x, float dir_y, int count) {
         const float vy = dir_x * std::sin(spread) + dir_y * std::cos(spread);
         const int w = static_cast<int>(rand(180.0f, 255.0f));
         particles_.push_back({Kind::Foam, x + rand(-8, 8), y + rand(-8, 8), vx * speed, vy * speed, 0.0f,
-                              rand(0.35f, 0.8f), rand(2.0f, 5.5f), 0.0f, 0.0f, GetColor(w, 255, 255)});
+                              rand(0.35f, 0.8f),                              rand(2.0f, 5.5f), 0.0f, 0.0f, GetColor(w, 244, 238)});
     }
 }
 
 void Fx::confetti(int count) {
-    static const int kColors[][3] = {{255, 90, 90}, {255, 200, 60}, {90, 220, 120},
-                                     {70, 180, 255}, {200, 120, 255}, {255, 255, 255}};
+    // 和紙の紙吹雪: 金茶・胡粉白・朱色・瑠璃
+    static const int kColors[][3] = {{228, 188, 112}, {235, 232, 222}, {204, 96, 78}, {88, 120, 168}};
     for (int i = 0; i < count && particles_.size() < kMaxParticles; ++i) {
-        const auto& c = kColors[std::uniform_int_distribution<int>(0, 5)(rng_)];
+        const auto& c = kColors[std::uniform_int_distribution<int>(0, 3)(rng_)];
         particles_.push_back({Kind::Confetti, rand(0.0f, static_cast<float>(kScreenW)), rand(-120.0f, -10.0f),
                               rand(-60.0f, 60.0f), rand(80.0f, 220.0f), 0.0f, rand(3.0f, 5.0f), rand(5.0f, 9.0f),
                               rand(0.0f, 6.28f), rand(-9.0f, 9.0f), GetColor(c[0], c[1], c[2])});

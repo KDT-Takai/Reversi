@@ -449,8 +449,8 @@ void App::draw() const {
 void App::draw_title() const {
     const Fonts& f = fonts();
     draw_text(130, 120, L"潮汐オセロ", color::text(), f.huge);
-    draw_text(136, 214, L"TIDAL REVERSI", color::accent(), f.large);
-    draw_text(140, 270, L"8 手ごとに、盤の外周が石ごと回る。", color::text_dim(), f.normal);
+    draw_text(138, 216, L"T I D A L  R E V E R S I", color::text_dim(), f.large);
+    draw_text(140, 270, L"8 手ごとに、盤の外縁が石ごと流れる。", color::text_dim(), f.normal);
     draw_button(kTitleStart, mouse_x_, mouse_y_);
     draw_button(kTitleHelp, mouse_x_, mouse_y_);
     draw_button(kTitleQuit, mouse_x_, mouse_y_);
@@ -469,8 +469,8 @@ void App::draw_title() const {
 
 void App::draw_mode_select() const {
     const Fonts& f = fonts();
-    draw_text_center(kScreenW / 2, 80, L"対局モードを選んでください", color::text(), f.large);
-    draw_text_center(kScreenW / 2, 190, L"対コンピューター（強さを選択）", color::text_dim(), f.normal);
+    draw_text_center(kScreenW / 2, 80, L"対局モード", color::text(), f.large);
+    draw_text_center(kScreenW / 2, 190, L"対コンピューター", color::text_dim(), f.normal);
     draw_button(kModeEasy, mouse_x_, mouse_y_);
     draw_button(kModeMedium, mouse_x_, mouse_y_);
     draw_button(kModeStrong, mouse_x_, mouse_y_);
@@ -498,14 +498,13 @@ void App::draw_setup() const {
         }
         case Mode::HotSeat:
             draw_text_center(kScreenW / 2, 170, L"2人で対局", color::text_dim(), f.normal);
-            draw_text_center(kScreenW / 2, 240, L"黒（先手）を持つプレイヤーを選んでください", color::text(), f.large);
+            draw_text_center(kScreenW / 2, 240, L"黒（先手）を持つプレイヤー", color::text(), f.large);
             draw_text_center(kScreenW / 2, 320, L"交互に盤面をクリックして打ちます。", color::text_dim(), f.caption);
             draw_button(kSetupP1Black, mouse_x_, mouse_y_);
             draw_button(kSetupP2Black, mouse_x_, mouse_y_);
             break;
         case Mode::AiVsAi:
-            draw_text_center(kScreenW / 2, 146, L"AI 対 AI（観戦）— それぞれの強さを選んでください", color::text(),
-                             f.normal);
+            draw_text_center(kScreenW / 2, 146, L"AI 対 AI（観戦）", color::text(), f.large);
             draw_disc(330.0f, 242.0f, 22.0f, Cell::Black);
             draw_text(366, 226, L"黒（先手）", color::text(), f.normal);
             draw_disc(330.0f, 328.0f, 22.0f, Cell::White);
@@ -598,7 +597,7 @@ void App::draw_hud() const {
         const bool active = !match_.ended() && match_.turn == c;
         if (active)
             DrawBoxAA(static_cast<float>(x - 8), static_cast<float>(y - 6), static_cast<float>(x + kHudW - 40),
-                      static_cast<float>(y + 46), GetColor(36, 60, 88), TRUE);
+                      static_cast<float>(y + 46), GetColor(32, 44, 64), TRUE);
         draw_disc(static_cast<float>(x + 18), static_cast<float>(y + 20), 18.0f, c);
         draw_text(x + 50, y + 6, std::format(L"{}　{}", color_name(c), player_label(c)), color::text(), f.normal);
         const std::wstring score = std::to_wstring(c == Cell::Black ? n.black : n.white);
@@ -612,7 +611,7 @@ void App::draw_hud() const {
     const int next_in = tide_anim ? 0 : match_.tide.next_in();
     const Dir dir = tide_anim ? event_.tide_dir : match_.tide.next_dir;
     DrawRoundRectAA(static_cast<float>(x - 8), static_cast<float>(y), static_cast<float>(kHudX + kHudW - 16),
-                    static_cast<float>(y + 190), 10, 10, 16, GetColor(18, 52, 70), TRUE);
+                    static_cast<float>(y + 190), 5, 5, 16, GetColor(16, 34, 52), TRUE);
     draw_text(x + 8, y + 12, L"次の潮汐まで", color::accent(), f.normal);
     const std::wstring num = std::to_wstring(next_in);
     draw_text(x + 20, y + 48, num, next_in <= 2 ? color::warn() : color::text(), f.huge);
@@ -643,7 +642,7 @@ void App::draw_hud() const {
         draw_text(x, y, L"次の手のあと、潮汐が起きます", color::accent(), f.normal);
     }
     if (stage_ == Stage::Idle && human_turn() && !match_.ended())
-        draw_text(x, y + 40, L"金色の枠のマスに置けます", color::text_dim(), f.caption);
+        draw_text(x, y + 40, L"金色の枠のマスへ置く", color::text_dim(), f.caption);
 
     draw_button(kHudHelp, mouse_x_, mouse_y_, scene_ == Scene::Playing);
     draw_button(kHudQuit, mouse_x_, mouse_y_, scene_ == Scene::Playing);
@@ -665,14 +664,14 @@ void App::draw_result() const {
     } else {
         const Cell winner = r == Result::BlackWin ? Cell::Black : Cell::White;
         if (mode_ == Mode::VsAi) {
-            headline = winner == human_color_ ? L"あなたの勝ち！" : L"CPU の勝ち";
+            headline = winner == human_color_ ? L"あなたの勝ち" : L"CPU の勝ち";
         } else {
-            headline = std::format(L"{}の勝ち！", color_name(winner));
+            headline = std::format(L"{}の勝ち", color_name(winner));
             sub = std::format(L"（{}）", player_label(winner));
         }
     }
     const int cx = kHudX + ox + kHudW / 2;
-    draw_text_center(cx, kHudY + 60, L"対局終了", color::text_dim(), f.normal);
+    draw_text_center(cx, kHudY + 24, L"対局終了", color::text_dim(), f.normal);
 
     // 見出しは少し遅れて上から落ちてくる
     const float h = clamp01((elapsed - 350.0f) / 400.0f);
